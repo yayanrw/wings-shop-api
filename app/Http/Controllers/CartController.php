@@ -16,7 +16,7 @@ class CartController extends Controller
     public function index()
     {
         try {
-            $cart = Cart::withoutTrashed()->get();
+            $cart = Cart::where('user_id', Auth::user()->id)->get();
             return $this->success($cart);
         } catch (Exception $e) {
             return $this->error(null, $e->getMessage(), MyApp::HTTP_INTERNAL_SERVER_ERROR);
@@ -34,7 +34,7 @@ class CartController extends Controller
                 'price' => $request->price,
                 'quantity' => $request->quantity,
                 'unit' => $request->unit,
-                'sub_total' => $request->sub_total,
+                'sub_total' => $request->price * $request->quantity,
                 'currency' => $request->currency,
             ]);
 
