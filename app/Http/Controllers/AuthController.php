@@ -55,7 +55,6 @@ class AuthController extends Controller
 
     public function logOut(Request $request)
     {
-        die('You must');
         try {
             $user = $request->user();
             $user->tokens()->delete();
