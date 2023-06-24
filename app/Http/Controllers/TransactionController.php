@@ -2,84 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
+use App\Models\TransactionDetail;
+use App\MyApp;
+use App\Traits\HttpResponses;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    use HttpResponses;
+    public function createTransactionFromCart()
     {
-        //
-    }
+        try {
+            $document_code = 'TRX';
+            $document_number = date('Ymd') . Auth::user()->id . Str::random(1);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+            // get all cart from own user
+            $carts = Cart::where('user_id', Auth::user()->id)->get();
+            $total = 0;
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+            foreach ($carts as $cart) {
+                $total += $cart->sub_total;
+            }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Transaction  $transaction
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Transaction $transaction)
-    {
-        //
-    }
+            // create header
+            $transaction = Transaction::create([
+                'document_code' => $document_code,
+                'document_number' => $document_number,
+                'user' => Auth::user()->id,
+                'total' => $total,
+                'date' => date('Y-m-d'),
+            ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Transaction  $transaction
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Transaction $transaction)
-    {
-        //
-    }
+            // create details
+            foreach ($carts as $cart) {
+                TransactionDetail::create([
+                    'transaction_id' => $transaction->id,
+                    'document_code' => $document_code,
+                    'document_number' => $document_number,
+                    'product_code' => $cart->product_code,
+                    'price' => $cart->price,
+                    'quantity' => $cart->quantity,
+                    'unit' => $cart->unit,
+                    'sub_total' => $cart->sub_total,
+                    'currency' => $cart->currency,
+                ]);
+            }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Transaction  $transaction
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
-    }
+            //delete carts
+            Cart::where('user_id', Auth::user()->id)->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Transaction  $transaction
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
+            return $this->success(null, MyApp::INSERTED_SUCCESSFULLY);
+        } catch (Exception $e) {
+            return $this->error(null, $e->getMessage(), MyApp::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
