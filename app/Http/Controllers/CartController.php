@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CartRequest;
+use App\Http\Requests\StoreCartRequest;
+use App\Http\Requests\UpdateCartRequest;
 use App\Models\Cart;
 use App\MyApp;
 use App\Traits\HttpResponses;
@@ -23,7 +25,7 @@ class CartController extends Controller
         }
     }
 
-    public function store(CartRequest $request)
+    public function store(StoreCartRequest $request)
     {
         try {
             $request->validated($request->all());
@@ -53,10 +55,11 @@ class CartController extends Controller
         }
     }
 
-    public function update(CartRequest $request, Cart $cart)
+    public function update(UpdateCartRequest $request, Cart $cart)
     {
         try {
             $cart->quantity = $request->quantity;
+            $cart->sub_total = $request->quantity * $cart->price;
             $cart->save();
 
             return $this->success($cart, MyApp::UPDATED_SUCCESSFULLY);
