@@ -19,15 +19,13 @@ return new class extends Migration
             $table->string('document_code', 3);
             $table->string('document_number', 10);
             $table->string('product_code', 18);
-            $table->unsignedBigInteger('price', 6)->default(0);
-            $table->unsignedBigInteger('quantity', 6)->default(0);
+            $table->unsignedBigInteger('price')->default(0);
+            $table->unsignedBigInteger('quantity')->default(0);
             $table->string('unit', 5);
-            $table->unsignedBigInteger('sub_total', 10)->default(0);
+            $table->unsignedBigInteger('sub_total')->default(0);
             $table->string('currency', 5);
             $table->timestamps();
-        });
 
-        Schema::table('transaction_details', function ($table) {
             $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
             $table->foreign('product_code')->references('code')->on('products')->onDelete('cascade');
         });
