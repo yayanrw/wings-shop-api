@@ -34,9 +34,9 @@ class ProductRequest extends FormRequest
                 Rule::unique('products', 'code')->ignore($productId),
             ],
             'name' => ['required', 'string', 'max:30'],
-            'price' => ['required', 'integer', 'digits_between:0,999999'],
+            'price' => ['required', 'integer', 'max_digits:6'],
             'currency' => ['required', 'string', 'max:5'],
-            'discount' => ['nullable', 'integer', 'digits_between:0,999999'],
+            'discount' => ['nullable', 'integer', 'max_digits:6'],
             'dimension' => ['nullable', 'string', 'max:50'],
             'unit' => ['required', 'string', 'max:5'],
         ];
