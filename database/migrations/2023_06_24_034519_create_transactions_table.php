@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('document_code');
-            $table->string('document_number');
+            $table->string('document_code', 3);
+            $table->string('document_number', 10);
             $table->unsignedBigInteger('user');
             $table->unsignedBigInteger('total')->default(0);
             $table->date('date');
