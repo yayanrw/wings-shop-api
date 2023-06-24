@@ -27,7 +27,6 @@ class CartRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => ['required', Rule::exists('users', 'id')],
             'product_code' => ['required', 'string', 'max:18', Rule::exists('products', 'code')],
             'price' => ['required', 'integer', 'max_digits:6'],
             'quantity' => ['required', 'integer', 'max_digits:6'],
