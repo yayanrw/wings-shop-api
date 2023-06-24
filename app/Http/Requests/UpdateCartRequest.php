@@ -3,11 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-use function PHPUnit\Framework\assertTrue;
-
-class CartRequest extends FormRequest
+class UpdateCartRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,12 +24,7 @@ class CartRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_code' => ['required', 'string', 'max:18', Rule::exists('products', 'code')],
-            'price' => ['required', 'integer', 'max_digits:6'],
             'quantity' => ['required', 'integer', 'max_digits:6'],
-            'unit' => ['required', 'string', 'max:5'],
-            'sub_total' => ['required', 'integer', 'max_digits:10'],
-            'currency' => ['required', 'string', 'max:5'],
         ];
     }
 }
