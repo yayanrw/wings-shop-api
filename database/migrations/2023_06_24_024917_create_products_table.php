@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 18)->unique();
             $table->string('name', 30);
+            $table->string('img_url')->nullable();
             $table->unsignedBigInteger('price');
             $table->string('currency', 5);
             $table->unsignedBigInteger('discount')->default('0');
