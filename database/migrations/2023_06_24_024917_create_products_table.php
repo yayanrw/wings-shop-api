@@ -17,11 +17,11 @@ return new class extends Migration
             $table->id();
             $table->string('code', 18)->unique();
             $table->string('name', 30);
-            $table->unsignedBigInteger('price')->nullable();
-            $table->string('currency', 5)->nullable();
-            $table->unsignedBigInteger('discount')->nullable();
+            $table->unsignedBigInteger('price');
+            $table->string('currency', 5);
+            $table->unsignedBigInteger('discount')->default('0');
             $table->string('dimension', 50)->nullable();
-            $table->string('unit', 5)->nullable();
+            $table->string('unit', 5);
             $table->timestamps();
             $table->softDeletes('deleted_at', $precision = 0);
             $table->unsignedBigInteger('created_by');
