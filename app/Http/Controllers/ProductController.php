@@ -10,6 +10,7 @@ use App\MyApp;
 use App\Traits\HttpResponses;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -21,15 +22,26 @@ class ProductController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $product = Product::withoutTrashed()->get();
-            return $this->success($product);
+            $searchQuery = $request->query('search');
+
+            if (!empty($searchQuery)) {
+
+                $products = Product::withoutTrashed()
+                    ->where('name', 'like', '%' . $searchQuery . '%')
+                    ->get();
+                return $this->success($products);
+            } else {
+                $products = Product::withoutTrashed()->get();
+                return $this->success($products);
+            }
         } catch (Exception $e) {
             return $this->error(null, $e->getMessage(), MyApp::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public function store(ProductRequest $request)
     {

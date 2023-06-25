@@ -18,7 +18,7 @@ class CartController extends Controller
     public function index()
     {
         try {
-            $cart = Cart::where('user_id', Auth::user()->id)->get();
+            $cart = Cart::with('product')->where('user_id', Auth::user()->id)->get();
             return $this->success($cart);
         } catch (Exception $e) {
             return $this->error(null, $e->getMessage(), MyApp::HTTP_INTERNAL_SERVER_ERROR);
@@ -34,18 +34,18 @@ class CartController extends Controller
 
             if ($isExist) {
                 $addedQty = $request->quantity + 1;
-                $isExist->quantity = $addedQty;
-                $isExist->sub_total = $request->price * $addedQty;
+                $isExist->quantity = intval($addedQty);
+                $isExist->sub_total = intval($request->price * $addedQty);
                 $isExist->save();
                 return $this->success($isExist, MyApp::UPDATED_SUCCESSFULLY);
             } else {
                 $cart = Cart::create([
                     'user_id' => Auth::user()->id,
                     'product_code' => $request->product_code,
-                    'price' => $request->price,
-                    'quantity' => $request->quantity,
+                    'price' => intval($request->price),
+                    'quantity' => intval($request->quantity),
                     'unit' => $request->unit,
-                    'sub_total' => $request->price * $request->quantity,
+                    'sub_total' => intval($request->price * $request->quantity),
                     'currency' => $request->currency,
                 ]);
                 return $this->success($cart, MyApp::INSERTED_SUCCESSFULLY);
@@ -67,7 +67,7 @@ class CartController extends Controller
     public function update(UpdateCartRequest $request, Cart $cart)
     {
         try {
-            $cart->quantity = $request->quantity;
+            $cart->quantity = intval($request->quantity);
             $cart->sub_total = $request->quantity * $cart->price;
             $cart->save();
 
