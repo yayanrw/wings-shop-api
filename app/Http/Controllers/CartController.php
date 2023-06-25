@@ -28,19 +28,28 @@ class CartController extends Controller
     public function store(StoreCartRequest $request)
     {
         try {
-            $request->validated($request->all());
+            $isExist = Cart::where('user_id', Auth::user()->id)
+                ->where('product_code', $request->product_code)
+                ->first();
 
-            $cart = Cart::create([
-                'user_id' => Auth::user()->id,
-                'product_code' => $request->product_code,
-                'price' => $request->price,
-                'quantity' => $request->quantity,
-                'unit' => $request->unit,
-                'sub_total' => $request->price * $request->quantity,
-                'currency' => $request->currency,
-            ]);
-
-            return $this->success($cart, MyApp::INSERTED_SUCCESSFULLY);
+            if ($isExist) {
+                $addedQty = $request->quantity + 1;
+                $isExist->quantity = $addedQty;
+                $isExist->sub_total = $request->price * $addedQty;
+                $isExist->save();
+                return $this->success($isExist, MyApp::UPDATED_SUCCESSFULLY);
+            } else {
+                $cart = Cart::create([
+                    'user_id' => Auth::user()->id,
+                    'product_code' => $request->product_code,
+                    'price' => $request->price,
+                    'quantity' => $request->quantity,
+                    'unit' => $request->unit,
+                    'sub_total' => $request->price * $request->quantity,
+                    'currency' => $request->currency,
+                ]);
+                return $this->success($cart, MyApp::INSERTED_SUCCESSFULLY);
+            }
         } catch (Exception $e) {
             return $this->error(null, $e->getMessage(), MyApp::HTTP_INTERNAL_SERVER_ERROR);
         }
